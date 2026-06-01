@@ -1,0 +1,23 @@
+.DS_Store
+/.build
+/Packages
+xcuserdata/
+DerivedData/
+.swiftpm/configuration/registries.json
+.swiftpm/xcode/package.xcworkspace/contents.xcworkspacedata
+.netrc
+
+# Xcode
+*.xcuserstate
+*.moved-aside
+*.hmap
+build/
+DerivedData/
+
+# CocoaPods
+Pods/
+Podfile.lock
+TestApp-CocoaPods/Pods/
+TestApp-CocoaPods/Podfile.lock
+TestApp-CocoaPods/*.xcworkspace
+!TestApp-CocoaPods/FastPackageTestApp.xcodeproj
