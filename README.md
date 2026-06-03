@@ -52,9 +52,18 @@ FastPackage-IOS/
 
 #### Swift Package Manager
 
-在 Xcode：**File → Add Package Dependencies**，填入仓库 URL，选择 product **`FastPackage`**。
+**在 Xcode 工程中集成（推荐）**
 
-或在 `Package.swift` 中：
+1. 打开你的 iOS App 工程（`.xcodeproj` / `.xcworkspace`）
+2. 菜单 **File → Add Package Dependencies…**
+3. 在搜索框填入仓库 URL：`https://github.com/ArturoYi/FastPackage-IOS.git`
+4. 选择版本规则（例如 **Up to Next Major** `0.0.1`）
+5. 在 product 列表中勾选 **`FastPackage`**，添加到需要依赖的 Target
+6. 编译工程，确认无链接错误
+
+**在 Swift Package 工程中集成**
+
+在 `Package.swift` 的 `dependencies` 与 `targets` 中加入：
 
 ```swift
 dependencies: [
@@ -70,28 +79,79 @@ targets: [
 ]
 ```
 
+**本地路径调试（开发本仓库或 fork 时）**
+
+在 Xcode：**File → Add Package Dependencies… → Add Local…**，选择本仓库根目录（含 `Package.swift` 的文件夹），再勾选 product **`FastPackage`**。
+
+或在依赖方的 `Package.swift` 中使用本地路径：
+
+```swift
+dependencies: [
+    .package(path: "../FastPackage-IOS"),
+],
+```
+
 #### CocoaPods
+
+在 `Podfile` 中加入：
 
 ```ruby
 platform :ios, '14.0'
 
 target 'YourApp' do
   use_frameworks!
-  pod 'FastPackage', '~> 0.0'
+  pod 'FastPackage', '~> x.x.x'
 end
 ```
 
-本地路径调试：
+安装并打开工程：
+
+```bash
+pod install
+open YourApp.xcworkspace   # 务必使用 .xcworkspace，不要用 .xcodeproj
+```
+
+**从 CocoaPods 仓库安装**：执行 `pod install` 后，在 App Target 的 **Build Phases → Link Binary With Libraries** 中应能看到 `FastPackage`。
+
+**本地路径调试**（开发本仓库时，在示例 App 或你的 App 的 `Podfile` 中）：
 
 ```ruby
 pod 'FastPackage', :path => '../FastPackage-IOS'
 ```
 
-### 导入
+然后同样执行 `pod install` 与 `open *.xcworkspace`。
+
+### 导入与基本使用
+
+在需要使用 API 的 Swift 文件中导入模块：
 
 ```swift
 import FastPackage
 ```
+
+最小示例（空安全 + 防抖）：
+
+```swift
+import UIKit
+import FastPackage
+
+class DemoViewController: UIViewController {
+    override func viewDidLoad() {
+        super.viewDidLoad()
+
+        let nickname: String? = nil
+        label.text = nickname.nullSafeOrEmpty  // ""
+
+        searchField.addDebouncedAction(duration: 0.5, for: .editingChanged) { _ in
+            FastDebounce.debounce(tag: "search", duration: 0.5) {
+                self.fetchResults()
+            }
+        }
+    }
+}
+```
+
+更完整的 API 说明见下文 [使用教程](#使用教程)。
 
 ## 使用教程
 
@@ -482,31 +542,82 @@ cardView.removeThrottledTapGesture(identifier: "select")
 cardView.removeDebouncedTapGesture(identifier: "preview")
 ```
 
-## 单元测试
+## 本地开发与单元测试
 
-在仓库根目录用 Xcode 打开 `Package.swift`，选择 scheme **`FastPackage-IOS`**，运行 **FastPackageTests**。
+本仓库为 **iOS 库**，测试与示例 App 均需在 **Xcode + iOS 模拟器** 环境下运行。终端中的裸 `swift test` 在 macOS 上会因缺少 UIKit 而失败，请使用下文方式。
 
-命令行（与 GitHub Actions 一致：Xcode 16.4 + iPhone 16 / iOS 18.5）：
+### 克隆与打开
+
+```bash
+git clone https://github.com/ArturoYi/FastPackage-IOS.git
+cd FastPackage-IOS
+open Package.swift    # 用 Xcode 打开 Swift Package
+```
+
+测试源码位于 `Tests/FastPackageTests/`（`Package.swift` 中 target 名 **`FastPackageTests`**）。
+
+### 运行单元测试
+
+#### 方式一：Xcode（推荐）
+
+1. 用 Xcode 打开仓库根目录的 `Package.swift`
+2. 顶部 Scheme 选择 **`FastPackage-IOS`**
+3. 运行目标选择任意 **iOS Simulator**（例如 iPhone 17）
+4. 菜单 **Product → Test**（快捷键 `⌘U`），执行 **FastPackageTests**
+
+#### 方式二：命令行
+
+在仓库根目录执行（与 [CI](.github/workflows/ci.yml) 一致：Xcode 16.4 + iPhone 16 / iOS 18.5）：
+
+```bash
+cd FastPackage-IOS
+
+xcodebuild test \
+  -scheme FastPackage-IOS \
+  -destination 'platform=iOS Simulator,name=iPhone 16,OS=18.5' \
+  -skipPackagePluginValidation \
+  -skipMacroValidation
+```
+
+若提示找不到模拟器，先查看本机可用目标：
+
+```bash
+xcodebuild -showdestinations -scheme FastPackage-IOS
+```
+
+将 `-destination` 改为你已安装的运行时，例如 Xcode 26+ 常见为：
 
 ```bash
 xcodebuild test \
   -scheme FastPackage-IOS \
-  -destination 'platform=iOS Simulator,name=iPhone 16,OS=18.5' \
-  -skipPackagePluginValidation
+  -destination 'platform=iOS Simulator,name=iPhone 17,OS=26.5' \
+  -skipPackagePluginValidation \
+  -skipMacroValidation
 ```
 
-若本机使用 Xcode 26+ 且已安装 iOS 26 运行时，也可改用例如 `name=iPhone 17,OS=26.5`。
+成功时终端会显示 **`TEST SUCCEEDED`**，并列出通过的测试数量。
 
-## 示例 App
+#### 注意事项
 
-仓库提供两个独立示例工程，分别验证两种集成方式，互不混用。
+| 方式 | 是否可用 | 说明 |
+|------|----------|------|
+| Xcode `⌘U` | ✅ | 本地开发首选 |
+| `xcodebuild test` + iOS 模拟器 | ✅ | 与 CI 相同，适合脚本 |
+| 裸 `swift test`（macOS） | ❌ | 库依赖 UIKit，需 iOS SDK |
 
-### TestApp-SPM（Swift Package Manager）
+### 示例 App
 
-1. 打开 `TestApp-SPM/FastPackageTestApp.xcodeproj`
-2. 选择模拟器，Run
+仓库提供两个独立示例工程，分别验证 **SPM** 与 **CocoaPods** 集成，互不混用。
 
-### TestApp-CocoaPods
+#### TestApp-SPM（Swift Package Manager）
+
+```bash
+open TestApp-SPM/FastPackageTestApp.xcodeproj
+```
+
+在 Xcode 中选择 iOS 模拟器，点击 **Run**（`⌘R`）。工程已通过本地 Package / 远程 Package 引用 `FastPackage`，可直接体验 API。
+
+#### TestApp-CocoaPods
 
 ```bash
 cd TestApp-CocoaPods
@@ -514,9 +625,12 @@ pod install
 open FastPackageTestApp.xcworkspace
 ```
 
+使用 **`.xcworkspace`** 打开，选择模拟器后 **Run**。`Podfile` 通过 `:path` 引用上级目录的本仓库。
+
 ## 开发说明
 
 - 对外模块名：`FastPackage`（`import FastPackage`）
+- 本地克隆、跑测试、示例 App：见 [本地开发与单元测试](#本地开发与单元测试)
 - 发布版本请同步更新：`FastPackage.version`、`FastPackage.podspec` 的 `s.version`、`CHANGELOG.md`、Git tag（格式 `x.y.z`，与 podspec 一致）
 - 提交 PR 前请运行单元测试，并在 `CHANGELOG.md` 的 `[Unreleased]` 小节补充变更说明
 - CI / 发版：推送 tag `x.y.z` 触发 [`.github/workflows/release.yml`](.github/workflows/release.yml)；需在仓库 Secrets 配置 `COCOAPODS_TRUNK_TOKEN`
