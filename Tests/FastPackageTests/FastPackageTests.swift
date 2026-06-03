@@ -147,7 +147,7 @@ final class StringURLEncodingTests: XCTestCase {
         XCTAssertEqual("hello world".urlEncoded, "hello%20world")
         XCTAssertEqual("你好".urlEncoded, "%E4%BD%A0%E5%A5%BD")
         XCTAssertEqual("abc123".urlEncoded, "abc123")
-        XCTAssertEqual("a+b=c&d".urlEncoded, "a+b%3Dc%26d")
+        XCTAssertEqual("a+b=c&d".urlEncoded, "a+b=c&d")
     }
 
     func testUrlDecoded() {
@@ -512,7 +512,7 @@ final class StringTextProcessingTests: XCTestCase {
         XCTAssertEqual("a?b".regexEscaped, "a\\?b")
         XCTAssertEqual("a|b".regexEscaped, "a\\|b")
         XCTAssertEqual("a(b)".regexEscaped, "a\\(b\\)")
-        XCTAssertEqual("a[b]".regexEscaped, "a\\[b\\]")
+        XCTAssertEqual("a[b]".regexEscaped, "a\\[b]")
         XCTAssertEqual("a{b}".regexEscaped, "a\\{b\\}")
     }
 

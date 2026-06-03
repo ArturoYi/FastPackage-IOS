@@ -19,6 +19,7 @@ public extension String {
     /// "".contains("a")                                    // false
     /// ```
     func contains(_ substring: String, caseSensitive: Bool = true) -> Bool {
+        if substring.isEmpty { return true }
         if caseSensitive {
             return range(of: substring) != nil
         } else {

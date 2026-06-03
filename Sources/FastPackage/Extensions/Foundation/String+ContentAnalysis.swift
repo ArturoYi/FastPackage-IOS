@@ -17,7 +17,9 @@ public extension String {
     /// ```
     func lines() -> [String] {
         guard !isEmpty else { return [] }
-        return components(separatedBy: CharacterSet.newlines)
+        // 先统一处理 \r\n 为 \n，避免 components(separatedBy:) 在 \r 和 \n 之间产生空元素
+        let normalized = replacingOccurrences(of: "\r\n", with: "\n")
+        return normalized.components(separatedBy: CharacterSet.newlines)
     }
 
     // MARK: Words
