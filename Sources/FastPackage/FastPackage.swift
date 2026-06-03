@@ -6,5 +6,5 @@ import Foundation
 /// API 设计参考 [fast_package](https://github.com/ArturoYi/fast_package)。
 public enum FastPackage {
     /// 当前库版本号（与 podspec / 发布 tag 对齐）。
-    public static let version = "1.0.0"
+    public static let version = "0.0.1"
 }
