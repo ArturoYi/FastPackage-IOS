@@ -27,12 +27,16 @@ jobs:
       - name: Verify Xcode
         run: xcodebuild -version
 
+      - name: List available schemes
+        run: xcodebuild -list
+
       - name: Run Swift Package tests
         run: |
           xcodebuild test \
             -scheme FastPackage-IOS \
             -destination '${{ env.XCODE_DESTINATION }}' \
-            -skipPackagePluginValidation
+            -skipPackagePluginValidation \
+            -skipMacroValidation
 
   lint-podspec:
     name: Lint Podspec

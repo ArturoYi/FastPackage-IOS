@@ -295,9 +295,17 @@ final class StringConversionTests: XCTestCase {
     // MARK: Float
 
     func testFloatValid() {
-        XCTAssertEqual("3.14".float(), 3.14, accuracy: 0.001)
-        XCTAssertEqual("-2.5".float(), -2.5, accuracy: 0.001)
-        XCTAssertEqual("0".float(), 0, accuracy: 0.001)
+        let val1: Float? = "3.14".float()
+        XCTAssertNotNil(val1)
+        XCTAssertEqual(val1!, 3.14, accuracy: 0.001)
+
+        let val2: Float? = "-2.5".float()
+        XCTAssertNotNil(val2)
+        XCTAssertEqual(val2!, -2.5, accuracy: 0.001)
+
+        let val3: Float? = "0".float()
+        XCTAssertNotNil(val3)
+        XCTAssertEqual(val3!, 0, accuracy: 0.001)
     }
 
     func testFloatInvalid() {
@@ -307,15 +315,25 @@ final class StringConversionTests: XCTestCase {
 
     func testFloatLocalized() {
         let localeFR = Locale(identifier: "fr_FR")
-        XCTAssertEqual("3,14".float(locale: localeFR), 3.14, accuracy: 0.001)
+        let val: Float? = "3,14".float(locale: localeFR)
+        XCTAssertNotNil(val)
+        XCTAssertEqual(val!, 3.14, accuracy: 0.001)
     }
 
     // MARK: Double
 
     func testDoubleValid() {
-        XCTAssertEqual("3.14159".double(), 3.14159, accuracy: 0.00001)
-        XCTAssertEqual("-2.5".double(), -2.5, accuracy: 0.00001)
-        XCTAssertEqual("0".double(), 0, accuracy: 0.00001)
+        let val1: Double? = "3.14159".double()
+        XCTAssertNotNil(val1)
+        XCTAssertEqual(val1!, 3.14159, accuracy: 0.00001)
+
+        let val2: Double? = "-2.5".double()
+        XCTAssertNotNil(val2)
+        XCTAssertEqual(val2!, -2.5, accuracy: 0.00001)
+
+        let val3: Double? = "0".double()
+        XCTAssertNotNil(val3)
+        XCTAssertEqual(val3!, 0, accuracy: 0.00001)
     }
 
     func testDoubleInvalid() {
@@ -325,15 +343,22 @@ final class StringConversionTests: XCTestCase {
 
     func testDoubleLocalized() {
         let localeFR = Locale(identifier: "fr_FR")
-        XCTAssertEqual("3,14159".double(locale: localeFR), 3.14159, accuracy: 0.00001)
+        let val: Double? = "3,14159".double(locale: localeFR)
+        XCTAssertNotNil(val)
+        XCTAssertEqual(val!, 3.14159, accuracy: 0.00001)
     }
 
     // MARK: CGFloat
 
     #if canImport(CoreGraphics)
     func testCGFloatValid() {
-        XCTAssertEqual("3.14".cgFloat(), 3.14, accuracy: 0.001)
-        XCTAssertEqual("-2.5".cgFloat(), -2.5, accuracy: 0.001)
+        let val1: CGFloat? = "3.14".cgFloat()
+        XCTAssertNotNil(val1)
+        XCTAssertEqual(Double(val1!), 3.14, accuracy: 0.001)
+
+        let val2: CGFloat? = "-2.5".cgFloat()
+        XCTAssertNotNil(val2)
+        XCTAssertEqual(Double(val2!), -2.5, accuracy: 0.001)
     }
 
     func testCGFloatInvalid() {
@@ -343,7 +368,9 @@ final class StringConversionTests: XCTestCase {
 
     func testCGFloatLocalized() {
         let localeFR = Locale(identifier: "fr_FR")
-        XCTAssertEqual("3,14".cgFloat(locale: localeFR), 3.14, accuracy: 0.001)
+        let val: CGFloat? = "3,14".cgFloat(locale: localeFR)
+        XCTAssertNotNil(val)
+        XCTAssertEqual(Double(val!), 3.14, accuracy: 0.001)
     }
     #endif
 }
